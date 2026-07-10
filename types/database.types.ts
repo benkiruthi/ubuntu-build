@@ -21,6 +21,10 @@ export interface Database {
           subscription_tier: string;
           subscription_expires_at: string | null;
           onboarding_complete: boolean;
+          bio: string | null;
+          years_experience: number | null;
+          portfolio_url: string | null;
+          listed_on_marketplace: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -35,6 +39,10 @@ export interface Database {
           subscription_tier?: string;
           subscription_expires_at?: string | null;
           onboarding_complete?: boolean;
+          bio?: string | null;
+          years_experience?: number | null;
+          portfolio_url?: string | null;
+          listed_on_marketplace?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -49,6 +57,10 @@ export interface Database {
           subscription_tier?: string;
           subscription_expires_at?: string | null;
           onboarding_complete?: boolean;
+          bio?: string | null;
+          years_experience?: number | null;
+          portfolio_url?: string | null;
+          listed_on_marketplace?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -339,6 +351,36 @@ export interface Database {
           created_at?: string;
         };
         Update: never;
+        Relationships: [];
+      };
+      marketplace_reviews: {
+        Row: {
+          id: string;
+          reviewer_id: string;
+          professional_id: string;
+          project_id: string | null;
+          rating: number;
+          body: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reviewer_id: string;
+          professional_id: string;
+          project_id?: string | null;
+          rating: number;
+          body?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reviewer_id?: string;
+          professional_id?: string;
+          project_id?: string | null;
+          rating?: number;
+          body?: string | null;
+          created_at?: string;
+        };
         Relationships: [];
       };
     };
