@@ -76,6 +76,14 @@ export default async function ProjectPage({
             )}
           </div>
         </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link href={`/projects/${id}/files`}>
+            <Button variant="outline" size="sm">📁 Files</Button>
+          </Link>
+          <Link href={`/projects/${id}/export`}>
+            <Button variant="outline" size="sm">📄 Export</Button>
+          </Link>
+        </div>
         <Badge
           variant={project.status === "active" ? "success" : "default"}
           className="capitalize"

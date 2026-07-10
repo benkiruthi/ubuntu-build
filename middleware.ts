@@ -8,6 +8,8 @@ const PUBLIC_PATHS = [
   "/auth/callback",
   "/api/auth",
   "/api/pay/webhook",
+  "/api/admin/auth",
+  "/admin/login",
 ];
 
 const AUTH_PATHS = ["/login", "/signup"];
@@ -50,6 +52,15 @@ export async function middleware(request: NextRequest) {
     pathname.includes(".")
   ) {
     return NextResponse.next();
+  }
+
+  // Admin panel — password-protect with session cookie
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    const adminCookie = request.cookies.get("admin_session")?.value;
+    const adminSecret = process.env.ADMIN_SECRET;
+    if (!adminSecret || adminCookie !== adminSecret) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
   }
 
   // Rate limit API routes

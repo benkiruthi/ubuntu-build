@@ -25,6 +25,7 @@ export interface Database {
           years_experience: number | null;
           portfolio_url: string | null;
           listed_on_marketplace: boolean;
+          welcome_email_sent: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -43,6 +44,7 @@ export interface Database {
           years_experience?: number | null;
           portfolio_url?: string | null;
           listed_on_marketplace?: boolean;
+          welcome_email_sent?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -61,6 +63,7 @@ export interface Database {
           years_experience?: number | null;
           portfolio_url?: string | null;
           listed_on_marketplace?: boolean;
+          welcome_email_sent?: boolean;
           created_at?: string;
           updated_at?: string;
         };

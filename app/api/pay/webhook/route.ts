@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "../../../../lib/supabase/server";
 import { getTransactionStatus } from "../../../../lib/pesapal";
+import { sendEmail } from "../../../../lib/email/send";
+import { subscriptionConfirmEmail, paymentFailedEmail } from "../../../../lib/email/templates";
 
 // ⚠️  HIGH-RISK: handles real M-Pesa payments.
 // Any changes to this file must be reviewed before deployment.
@@ -74,6 +76,33 @@ export async function POST(request: Request) {
       body: `Your ${tier} plan is now active. Enjoy your new AI modules!`,
       link: "/dashboard",
     });
+
+    // Send confirmation email
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", payment.user_id)
+      .single();
+    if (profile?.email) {
+      const { subject, html } = subscriptionConfirmEmail(
+        profile.full_name ?? "",
+        tier,
+        expiresAt.toISOString()
+      );
+      sendEmail({ to: profile.email, subject, html }).catch(console.error);
+    }
+  }
+
+  if (!completed && failed) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", payment.user_id)
+      .single();
+    if (profile?.email) {
+      const { subject, html } = paymentFailedEmail(profile.full_name ?? "", payment.amount_kes);
+      sendEmail({ to: profile.email, subject, html }).catch(console.error);
+    }
   }
 
   if (payment.purpose === "phase_unlock") {
