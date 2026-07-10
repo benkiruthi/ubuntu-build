@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "../../lib/supabase/server";
 import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { formatKES, formatDate } from "../../lib/utils";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card";

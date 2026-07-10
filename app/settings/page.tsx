@@ -1,5 +1,7 @@
 import { createClient } from "../../lib/supabase/server";
 import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { ProfileSettingsForm } from "../../components/settings/profile-settings-form";
 import type { Metadata } from "next";
 

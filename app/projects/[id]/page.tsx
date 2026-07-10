@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { createClient } from "../../../lib/supabase/server";
 import { formatKES, formatDate } from "../../../lib/utils";
 import { Badge } from "../../../components/ui/badge";
@@ -10,8 +12,9 @@ import { PROJECT_PHASES, SUBSCRIPTION_TIERS } from "../../../lib/theme";
 export default async function ProjectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,7 +25,7 @@ export default async function ProjectPage({
     supabase
       .from("projects")
       .select("*")
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("owner_id", user.id)
       .is("deleted_at", null)
       .single(),
@@ -34,7 +37,7 @@ export default async function ProjectPage({
     supabase
       .from("ai_sessions")
       .select("id, agent_type, status, created_at, updated_at")
-      .eq("project_id", params.id)
+      .eq("project_id", id)
       .order("updated_at", { ascending: false }),
   ]);
 

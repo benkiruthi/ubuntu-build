@@ -1,6 +1,8 @@
 import { SignupForm } from "../../components/auth/signup-form";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Create Account — Ebbli Build" };
 
 export default function SignupPage() {
