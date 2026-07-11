@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "../../../../../lib/supabase/server";
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -9,10 +9,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const hdrs = await headers();
-  const adminSecret = hdrs.get("x-admin-secret");
+  const jar = await cookies();
+  const adminSession = jar.get("admin_session")?.value;
 
-  if (!process.env.ADMIN_SECRET || adminSecret !== process.env.ADMIN_SECRET) {
+  if (!process.env.ADMIN_SECRET || adminSession !== process.env.ADMIN_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

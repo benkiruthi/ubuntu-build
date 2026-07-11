@@ -5,10 +5,11 @@ import { sendEmail } from "../../../../lib/email/send";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const secret = searchParams.get("secret");
+  // Vercel cron jobs send Authorization: Bearer <CRON_SECRET> automatically
+  const authHeader = request.headers.get("authorization");
+  const expected = process.env.CRON_SECRET ? `Bearer ${process.env.CRON_SECRET}` : null;
 
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+  if (!expected || authHeader !== expected) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

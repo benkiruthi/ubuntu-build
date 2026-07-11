@@ -23,8 +23,12 @@ export async function GET(request: Request) {
         const email = profile.email ?? data.user.email;
         if (email) {
           const { subject, html } = welcomeEmail(profile.full_name ?? "");
-          // Fire-and-forget — don't block the redirect
           sendEmail({ to: email, subject, html }).catch(console.error);
+          // Mark sent so we don't fire again on subsequent logins
+          void supabase
+            .from("profiles")
+            .update({ welcome_email_sent: true })
+            .eq("id", data.user.id);
         }
       }
 

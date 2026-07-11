@@ -52,6 +52,17 @@ export async function POST(request: Request) {
     .eq("id", payment.id);
 
   if (!completed) {
+    if (failed) {
+      const { data: failedProfile } = await supabase
+        .from("profiles")
+        .select("email, full_name")
+        .eq("id", payment.user_id)
+        .single();
+      if (failedProfile?.email) {
+        const { subject, html } = paymentFailedEmail(failedProfile.full_name ?? "", payment.amount_kes);
+        sendEmail({ to: failedProfile.email, subject, html }).catch(console.error);
+      }
+    }
     return NextResponse.json({ message: "Payment not completed" });
   }
 
@@ -77,7 +88,6 @@ export async function POST(request: Request) {
       link: "/dashboard",
     });
 
-    // Send confirmation email
     const { data: profile } = await supabase
       .from("profiles")
       .select("email, full_name")
@@ -89,18 +99,6 @@ export async function POST(request: Request) {
         tier,
         expiresAt.toISOString()
       );
-      sendEmail({ to: profile.email, subject, html }).catch(console.error);
-    }
-  }
-
-  if (!completed && failed) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("email, full_name")
-      .eq("id", payment.user_id)
-      .single();
-    if (profile?.email) {
-      const { subject, html } = paymentFailedEmail(profile.full_name ?? "", payment.amount_kes);
       sendEmail({ to: profile.email, subject, html }).catch(console.error);
     }
   }
