@@ -14,6 +14,7 @@ export function SignupForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [facebookLoading, setFacebookLoading] = useState(false);
   const supabase = createClient();
 
   async function handleSignup(e: React.FormEvent) {
@@ -53,6 +54,20 @@ export function SignupForm() {
     }
   }
 
+  async function handleFacebook() {
+    setFacebookLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+      setFacebookLoading(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <Button
@@ -69,6 +84,19 @@ export function SignupForm() {
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
         </svg>
         Continue with Google
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={handleFacebook}
+        loading={facebookLoading}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
+          <path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.313 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
+        </svg>
+        Continue with Facebook
       </Button>
 
       <div className="relative flex items-center gap-3">
