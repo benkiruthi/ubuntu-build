@@ -12,9 +12,14 @@ export function SignupForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [showPhone, setShowPhone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
+  const [phoneLoading, setPhoneLoading] = useState(false);
   const supabase = createClient();
 
   async function handleSignup(e: React.FormEvent) {
@@ -68,6 +73,46 @@ export function SignupForm() {
     }
   }
 
+  async function handlePhoneOTP() {
+    setPhoneLoading(true);
+    try {
+      if (!otpSent) {
+        if (!phone.trim()) {
+          toast.error("Enter your phone number.");
+          setPhoneLoading(false);
+          return;
+        }
+        const normalized = phone.replace(/^0/, "+254").replace(/\D/g, "");
+        const { error } = await supabase.auth.signInWithOtp({ phone: normalized });
+        if (error) {
+          toast.error(error.message || "Failed to send OTP.");
+        } else {
+          setOtpSent(true);
+        }
+      } else {
+        if (!otp.trim()) {
+          toast.error("Enter the OTP.");
+          setPhoneLoading(false);
+          return;
+        }
+        const normalized = phone.replace(/^0/, "+254").replace(/\D/g, "");
+        const { error } = await supabase.auth.verifyOtp({
+          phone: normalized,
+          token: otp,
+          type: "sms",
+        });
+        if (error) {
+          toast.error(error.message || "Invalid OTP.");
+        } else {
+          router.push("/onboarding");
+        }
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Something went wrong.");
+    }
+    setPhoneLoading(false);
+  }
+
   return (
     <div className="space-y-4">
       <Button
@@ -98,6 +143,45 @@ export function SignupForm() {
         </svg>
         Continue with Facebook
       </Button>
+
+      {!showPhone ? (
+        <Button type="button" variant="outline" className="w-full" onClick={() => setShowPhone(true)}>
+          📱 Continue with Phone
+        </Button>
+      ) : (
+        <div className="space-y-3 p-4 bg-[var(--muted)] rounded-xl">
+          <Input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="0712345678 or +254712345678"
+            disabled={otpSent}
+          />
+          {otpSent && (
+            <Input
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="6-digit OTP"
+              maxLength={6}
+            />
+          )}
+          <Button type="button" className="w-full" onClick={handlePhoneOTP} loading={phoneLoading}>
+            {otpSent ? "Verify OTP" : "Send OTP"}
+          </Button>
+          <button
+            onClick={() => {
+              setShowPhone(false);
+              setPhone("");
+              setOtp("");
+              setOtpSent(false);
+            }}
+            className="text-xs text-[var(--primary)] hover:underline w-full text-center"
+          >
+            Back
+          </button>
+        </div>
+      )}
 
       <div className="relative flex items-center gap-3">
         <div className="flex-1 h-px bg-[var(--border)]" />
