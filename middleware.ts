@@ -10,6 +10,9 @@ const PUBLIC_PATHS = [
   "/api/pay/webhook",
   "/api/admin/auth",
   "/admin/login",
+  "/terms",
+  "/privacy",
+  "/marketplace",
 ];
 
 const AUTH_PATHS = ["/login", "/signup"];
